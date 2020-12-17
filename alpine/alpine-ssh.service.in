@@ -3,18 +3,30 @@ Description=Alpine Developer Environment with local SSH Access
 Documentation=man:sshd(8) man:sshd_config(5)
 
 [Service]
-Type=simple
-Restart=on-failure
+Type=forking
+Restart=always
+ExecStartPre=/usr/bin/rm -f %t/%n-pid %t/%n-cid
 ExecStart=%%PODMAN%% run \
-    -p %%PORT%%:%%PORT%% \
-    -v %%HOME%%/.abuild:/home/alpine/.abuild:Z \
-    -v %%APORTSDIR%%:/home/alpine/aports:Z \
+    --conmon-pidfile %t/%n-pid \
+    --cidfile %t/%n-cid \
+    --publish %%PORT%%:%%PORT%% \
+    --volume %%HOME%%/.abuild:/home/alpine/.abuild:Z \
+    --volume %%APORTSDIR%%:/home/alpine/aports:Z \
+    --volume %%HOME%%/packages:/home/alpine/packages:Z \
     --userns=keep-id \
     --tty \
     --name alpine-development-environment \
+    --detach \
     alpine-dev-env
-ExecStop=%%PODMAN%% stop -t 10 alpine-dev-env
+ExecStop=%%PODMAN%% stop \
+    --time 2 \
+    --cidfile %t/%n-cid
+ExecStopPost=%%PODMAN%% rm \
+    --ignore \
+    --force \
+    --cidfile %t/%n-cid
 KillMode=none
+PIDFile=%t/%n-pid
 
 [Install]
 WantedBy=multi-user.target
