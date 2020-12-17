@@ -6,20 +6,18 @@ GID ?= $(shell id -g)
 HOME ?= $$HOME
 APORTSDIR ?= $$APORTSDIR
 
-.PHONY: all
+.PHONY: install
 all: sanity abuild dockerfile keygen systemd
 
 sanity:
 	@[ "$$APORTSDIR" ] || ( \
-		printf -- "APORTSDIR variable not set, must be absolute path to aports\\n" >&2 ; \
-		exit 1 ; \
+		$(error APORTSDIR is not set, must be absolute path to aports)
 	)
 
 abuild: abuild.in
 	sed -e 's|%%PORT%%|$(PORT)|g' \
 		abuild.in >| abuild
 	chmod +x abuild
-	install -Dm0755 abuild -t $(HOME)/bin
 
 keygen:
 	@if [ ! -f $$HOME/.ssh/alpine-dev-env ] || [ ! -f $$HOME/.ssh/alpine-dev-env.pub ]; then \
@@ -33,7 +31,6 @@ systemd: alpine-ssh.service.in
 		-e 's|%%APORTSDIR%%|$(APORTSDIR)|g' \
 		-e 's|%%HOME%%|$(HOME)|g' \
 		alpine-ssh.service.in >| alpine-ssh.service
-	install -Dm0644 alpine-ssh.service -t $$HOME/.config/systemd/user
 
 dockerfile: Dockerfile.in
 	sed	-e 's|%%PORT%%|$(PORT)|g' \
@@ -43,3 +40,8 @@ dockerfile: Dockerfile.in
 
 image: all
 	$(PODMAN) build -t alpine-dev-env .
+
+install: image
+	install -Dm0755 abuild -t $(HOME)/bin
+	install -Dm0644 alpine-ssh.service -t $$HOME/.config/systemd/user
+	rm -f alpine-dev-env.pub
