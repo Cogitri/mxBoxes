@@ -1,18 +1,25 @@
 PORT ?= 2223
-PODMAN ?= $(shell command -v podman)
+PODMAN ?= $(shell echo $${PODMAN:-/usr/bin/podman})
 USER ?= $(shell id -u -n)
 UID ?= $(shell id -u)
 GID ?= $(shell id -g)
-HOME ?= $(shell echo $$HOME)
-APORTSDIR ?= $(shell echo $$HOME)/aports
+HOME ?= $$HOME
+APORTSDIR ?= $$APORTSDIR
 
 .PHONY: all
-all: abuild dockerfile keygen systemd
+all: sanity abuild dockerfile keygen systemd
+
+sanity:
+	@[ "$$APORTSDIR" ] || ( \
+		printf -- "APORTSDIR variable not set, must be absolute path to aports\\n" >&2 ; \
+		exit 1 ; \
+	)
 
 abuild: abuild.in
 	sed -e 's|%%PORT%%|$(PORT)|g' \
 		abuild.in >| abuild
 	chmod +x abuild
+	install -Dm0755 abuild -t $(HOME)/bin
 
 keygen:
 	@if [ ! -f $$HOME/.ssh/alpine-dev-env ] || [ ! -f $$HOME/.ssh/alpine-dev-env.pub ]; then \
