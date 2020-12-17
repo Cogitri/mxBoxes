@@ -1,0 +1,17 @@
+#!/bin/sh
+die() {
+    printf "%s\\n" "$*" >&2
+    exit 1
+}
+
+## check running from within an `aports` tree
+if [ "${PWD%*/aports/*}" = "$PWD" ]; then
+	die "Error: expecting to be run from within an aports tree!" \
+		"Could not find '/aports/' in the current path: $PWD"
+fi
+
+ssh -p %%PORT%% -tt \
+    -o User=alpine \
+    -o IdentityFile=~/.ssh/alpine-dev-env \
+    -o NoHostAuthenticationForLocalhost=yes \
+    localhost "cd /home/alpine/aports/${PWD#*/aports/} && abuild $@"

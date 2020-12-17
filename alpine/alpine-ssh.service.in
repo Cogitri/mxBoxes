@@ -1,0 +1,20 @@
+[Unit]
+Description=Alpine Developer Environment with local SSH Access
+Documentation=man:sshd(8) man:sshd_config(5)
+
+[Service]
+Type=simple
+Restart=on-failure
+ExecStart=%%PODMAN%% run \
+    -p %%PORT%%:%%PORT%% \
+    -v %%HOME%%/.abuild:/home/alpine/.abuild:Z \
+    -v %%APORTSDIR%%:/home/alpine/aports:Z \
+    --userns=keep-id \
+    --tty \
+    --name alpine-development-environment \
+    alpine-dev-env
+ExecStop=%%PODMAN%% stop -t 10 alpine-dev-env
+KillMode=none
+
+[Install]
+WantedBy=multi-user.target
