@@ -4,7 +4,7 @@ MAINTAINER Leo <thinkabit.ukim@gmail.com>
 RUN rm /etc/apk/repositories \
     && printf -- >> /etc/apk/repositories \
     'http://dl-cdn.alpinelinux.org/alpine/edge/%s\n' \
-    main community testing \\
+    main community testing \
     && printf -- >> /etc/apk/repositories \
     '/home/alpine/packages/%s\n' \
     main community testing
