@@ -10,8 +10,21 @@ if [ "${PWD%*/aports/*}" = "$PWD" ]; then
 		"Could not find '/aports/' in the current path: $PWD"
 fi
 
-ssh -p %%PORT%% -tt \
-    -o User=alpine \
-    -o IdentityFile=~/.ssh/alpine-dev-env \
-    -o NoHostAuthenticationForLocalhost=yes \
-    localhost "cd /home/alpine/aports/${PWD#*/aports/} && abuild $@"
+case "$1" in
+    checksum|unpack)
+        ssh -p %%PORT%% -tt \
+            -o User=alpine \
+            -o IdentityFile=~/.ssh/alpine-dev-env \
+            -o NoHostAuthenticationForLocalhost=yes \
+            -o LogLevel=QUIET \
+            localhost "cd /home/alpine/aports/${PWD#*/aports/} && abuild $@"
+            ;;
+    *)
+        ssh -p %%PORT%% -tt \
+            -o User=alpine \
+            -o IdentityFile=~/.ssh/alpine-dev-env \
+            -o NoHostAuthenticationForLocalhost=yes \
+            -o LogLevel=QUIET \
+            localhost "cd /home/alpine/aports/${PWD#*/aports/} && sudo apk upgrade -U -a && abuild $@"
+            ;;
+esac
