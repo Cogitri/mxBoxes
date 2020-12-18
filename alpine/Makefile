@@ -1,6 +1,7 @@
 PORT ?= 2223
 PODMAN ?= $(shell command -v podman)
 PODMAN_BUILD ?= $(shell command -v podman)
+SSH_KEYGEN ?= $(shell command -v ssh-keygen)
 UID ?= $(shell id -u)
 GID ?= $(shell id -g)
 HOME ?= $(shell echo $$HOME)
@@ -8,7 +9,13 @@ APORTSDIR ?= $(shell echo $$APORTSDIR)
 
 .DEFAULT_GOAL := install
 
-sanity: sanity-podman sanity-podman-build sanity-uid sanity-gid sanity-aportsdir sanity-home
+sanity: sanity-ssh-keygen \
+		sanity-podman \
+		sanity-podman-build \
+		sanity-uid \
+		sanity-gid \
+		sanity-aportsdir \
+		sanity-home
 
 sanity-podman:
 ifeq ($(strip $(PODMAN)),)
@@ -40,12 +47,17 @@ ifeq ($(strip $(HOME)),)
 	$(error HOME is not set, it must be set to the home directory)
 endif
 
+sanity-ssh-keygen:
+ifeq ($(strip $(SSH_KEYGEN)),)
+	$(error ssh-keygen not installed, pass path to ssh-keygen binary via SSH_KEYGEN=)
+endif
+
 abuild: abuild.in
 	sed -e 's|%%PORT%%|$(PORT)|g' \
 		abuild.in >| abuild
 	chmod +x abuild
 
-keygen: sanity-home
+keygen: sanity-ssh-keygen sanity-home
 	@if [ ! -f $(HOME)/.ssh/alpine-dev-env ] || [ ! -f $(HOME)/.ssh/alpine-dev-env.pub ]; then \
 		echo y | ssh-keygen -t ed25519 -f $(HOME)/.ssh/alpine-dev-env -q -N ""; \
 	fi
