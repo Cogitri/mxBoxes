@@ -9,7 +9,7 @@ RUN rm /etc/apk/repositories \
     '/home/alpine/packages/%s\n' \
     main community testing
 
-RUN apk add -U --no-cache alpine-sdk abuild sudo openssh-server shadow
+RUN apk add -U --no-cache alpine-sdk abuild sudo openssh-server shadow fish
 RUN apk upgrade -a
 
 RUN /usr/bin/ssh-keygen -A
