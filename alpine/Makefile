@@ -71,8 +71,6 @@ keygen: sanity-ssh-keygen sanity-home
 systemd: sanity-podman sanity-aportsdir sanity-home alpine-ssh.service.in
 	sed -e 's|%%PORT%%|$(PORT)|g' \
 		-e 's|%%PODMAN%%|$(PODMAN)|g' \
-		-e 's|%%APORTSDIR%%|$(APORTSDIR)|g' \
-		-e 's|%%HOME%%|$(HOME)|g' \
 		alpine-ssh.service.in >| alpine-ssh.service
 
 dockerfile: sanity-uid sanity-gid Dockerfile.in
