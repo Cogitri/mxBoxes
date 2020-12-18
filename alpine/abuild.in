@@ -13,11 +13,17 @@ run() {
         localhost "$@"
 }
 
+: ${APORTSDIR:=%%APORTSDIR%%}
+
+APORTSDIRNAME="$(basename $APORTSDIR)"
+
 ## check running from within an `aports` tree
-if [ "${PWD%*/aports/*}" = "$PWD" ]; then
-	die "Error: expecting to be run from within an aports tree!" \
-		"Could not find '/aports/' in the current path: $PWD"
+if [ "${PWD%*/$APORTSDIRNAME/*}" = "$PWD" ]; then
+    die "Error: expecting to be run from within an aports tree!" \
+        "It must be run under '$APORTSDIR'"
 fi
+
+APORTSDIR="$(printf -- "%s" "$APORTSDIR" | sed -e "s|$HOME|/home/alpine|")"
 
 # Generate new abuild key if not set
 cmd='grep -sq "^PACKAGER_PRIVKEY=" /home/alpine/.abuild/abuild.conf || abuild-keygen -n -a'
@@ -28,8 +34,8 @@ cmd='grep -sq "^PACKAGER_PRIVKEY=" /home/alpine/.abuild/abuild.conf || abuild-ke
 cmd="$cmd && sudo cp -v /home/alpine/.abuild/*.rsa.pub /etc/apk/keys"
 
 case "$1" in
-    checksum|unpack) cmd="$cmd; cd /home/alpine/aports/${PWD#*/aports/} && abuild $@" ;;
-    *) cmd="$cmd && cd /home/alpine/aports/${PWD#*/aports/} && sudo apk upgrade -U -a && abuild $@" ;;
+    checksum|unpack) cmd="$cmd; cd $APORTSDIR/${PWD#*/$APORTSDIRNAME/} && abuild $@" ;;
+    *) cmd="$cmd && cd $APORTSDIR/${PWD#*/$APORTSDIRNAME/} && sudo apk upgrade -U -a && abuild $@" ;;
 esac
 
 run "$cmd"
