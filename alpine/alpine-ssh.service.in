@@ -7,6 +7,7 @@ Type=forking
 Restart=always
 ExecStartPre=/usr/bin/rm -f %t/%n-pid %t/%n-cid
 ExecStart=%%PODMAN%% run \
+    --replace \
     --conmon-pidfile %t/%n-pid \
     --cidfile %t/%n-cid \
     --publish %%PORT%%:%%PORT%% \
