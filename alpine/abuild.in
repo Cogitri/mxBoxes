@@ -10,6 +10,16 @@ if [ "${PWD%*/aports/*}" = "$PWD" ]; then
 		"Could not find '/aports/' in the current path: $PWD"
 fi
 
+# Copy keys over, we need this so packages will actually succeed when
+# building (because of the signing stage), this is also required to
+# install them
+ssh -p %%PORT%% -tt \
+    -o User=alpine \
+    -o IdentityFile=~/.ssh/alpine-dev-env \
+    -o NoHostAuthenticationForLocalhost=yes \
+    -o LogLevel=QUIET \
+    localhost "sudo cp -v /home/alpine/.abuild/*.rsa.pub /etc/apk/keys"
+
 case "$1" in
     checksum|unpack)
         ssh -p %%PORT%% -tt \
