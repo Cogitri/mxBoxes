@@ -19,20 +19,8 @@ RUN adduser -D -u %%UID%% -g %%GID%% -h /home/alpine -D alpine \
     && addgroup alpine abuild \
     && echo 'alpine ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
 
-USER alpine
-WORKDIR /home/alpine
-COPY alpine-dev-env.pub alpine-dev-env.pub
-
-RUN date
-RUN mkdir .ssh \
-    && cat alpine-dev-env.pub >> .ssh/authorized_keys \
-    && chmod og-wx .ssh/authorized_keys \
-    && rm -f alpine-dev-env.pub
-
-RUN mkdir packages
+RUN sed -i 's|alpine:!|alpine:*|' /etc/shadow
 
 USER root
-
-RUN sed -i 's|alpine:!|alpine:*|' /etc/shadow
 
 CMD ["/usr/sbin/sshd", "-D"]

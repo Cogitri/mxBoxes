@@ -54,6 +54,7 @@ endif
 
 abuild: abuild.in
 	sed -e 's|%%PORT%%|$(PORT)|g' \
+		-e 's|%%APORTSDIR%%|$(APORTSDIR)|g' \
 		abuild.in >| abuild
 	chmod +x abuild
 
