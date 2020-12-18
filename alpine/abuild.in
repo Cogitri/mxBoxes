@@ -19,12 +19,17 @@ if [ "${PWD%*/aports/*}" = "$PWD" ]; then
 		"Could not find '/aports/' in the current path: $PWD"
 fi
 
+# Generate new abuild key if not set
+cmd='grep -sq "^PACKAGER_PRIVKEY=" /home/alpine/.abuild/abuild.conf || abuild-keygen -n -a'
+
 # Copy keys over, we need this so packages will actually succeed when
 # building (because of the signing stage), this is also required to
 # install them
-run "sudo cp -v /home/alpine/.abuild/*.rsa.pub /etc/apk/keys"
+cmd="$cmd && sudo cp -v /home/alpine/.abuild/*.rsa.pub /etc/apk/keys"
 
 case "$1" in
-    checksum|unpack) run "cd /home/alpine/aports/${PWD#*/aports/} && abuild $@" ;;
-    *) run "cd /home/alpine/aports/${PWD#*/aports/} && sudo apk upgrade -U -a && abuild $@" ;;
+    checksum|unpack) cmd="$cmd; cd /home/alpine/aports/${PWD#*/aports/} && abuild $@" ;;
+    *) cmd="$cmd && cd /home/alpine/aports/${PWD#*/aports/} && sudo apk upgrade -U -a && abuild $@" ;;
 esac
+
+run "$cmd"
