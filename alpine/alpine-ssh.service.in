@@ -11,9 +11,8 @@ ExecStart=%%PODMAN%% run \
     --conmon-pidfile %t/%n-pid \
     --cidfile %t/%n-cid \
     --publish %%PORT%%:%%PORT%% \
-    --volume %%HOME%%/.abuild:/home/alpine/.abuild:Z \
-    --volume %%APORTSDIR%%:/home/alpine/aports:Z \
-    --volume %%HOME%%/packages:/home/alpine/packages:Z \
+    --volume %h:/home/alpine \
+    --security-opt label=disable \
     --userns=keep-id \
     --tty \
     --name alpine-development-environment \
