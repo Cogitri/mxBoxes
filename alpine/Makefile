@@ -1,5 +1,6 @@
 PORT ?= 2223
 PODMAN ?= $(shell command -v podman)
+PODMAN_BUILD ?= $(shell command -v podman)
 UID ?= $(shell id -u)
 GID ?= $(shell id -g)
 HOME ?= $(shell echo $$HOME)
@@ -7,11 +8,16 @@ APORTSDIR ?= $(shell echo $$APORTSDIR)
 
 .DEFAULT_GOAL := install
 
-sanity: sanity-podman sanity-uid sanity-gid sanity-aportsdir sanity-home
+sanity: sanity-podman sanity-podman-build sanity-uid sanity-gid sanity-aportsdir sanity-home
 
 sanity-podman:
 ifeq ($(strip $(PODMAN)),)
-	$(error podman must be installed)
+	$(error podman to run in the systemd system service could not be found, set it with PODMAN=)
+endif
+
+sanity-podman-build:
+ifeq ($(strip $(PODMAN_BUILD)),)
+	$(error podman used to build the image could not be found, set it with PODMAN_BUILD=)
 endif
 
 sanity-uid:
@@ -58,8 +64,8 @@ dockerfile: sanity-uid sanity-gid Dockerfile.in
 		-e 's|%%GID%%|$(GID)|g' \
 		Dockerfile.in >| Dockerfile
 
-image: sanity-podman
-	$(PODMAN) build -t alpine-dev-env .
+image: sanity-podman-build
+	$(PODMAN_BUILD) build -t alpine-dev-env .
 
 install: sanity abuild keygen systemd dockerfile image
 	install -Dm0755 abuild -t $(HOME)/bin
