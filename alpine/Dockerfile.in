@@ -9,8 +9,16 @@ RUN rm /etc/apk/repositories \
     '/home/alpine/packages/%s\n' \
     main community testing
 
-RUN apk add -U --no-cache alpine-sdk abuild sudo openssh-server shadow fish
+RUN apk add -U --no-cache \
+    alpine-conf \
+    alpine-sdk \
+    abuild \
+    sudo \
+    openssh-server \
+    shadow \
+    fish
 RUN apk upgrade -a
+RUN setup-apkcache /var/cache/apk
 
 RUN /usr/bin/ssh-keygen -A
 RUN printf "Port %%PORT%%\nListenAddress localhost\nPermitEmptyPasswords yes\n" >> /etc/ssh/sshd_config
