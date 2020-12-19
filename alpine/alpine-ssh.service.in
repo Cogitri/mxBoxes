@@ -1,14 +1,14 @@
 [Unit]
-Description=Alpine Developer Environment with local SSH Access
+Description=Podman container-alpine-dev-env-for-%u.service
 
 [Service]
-Type=forking
-Restart=always
-ExecStartPre=/usr/bin/rm -f %t/%n-pid %t/%n-cid
+Environment=PODMAN_SYSTEMD_UNIT=%n
+Restart=on-failure
+ExecStartPre=/usr/bin/rm -f %t/alpine-dev-env-for-%u.pid %t/alpine-dev-env-for-%u.ctr-id
 ExecStart=%%PODMAN%% run \
     --replace \
-    --conmon-pidfile %t/%n-pid \
-    --cidfile %t/%n-cid \
+    --conmon-pidfile %t/alpine-dev-env-for-%u.pid \
+    --cidfile %t/alpine-dev-env-for-%u.ctr-id \
     --publish %%PORT%%:%%PORT%% \
     --volume %h:%h \
     --security-opt label=disable \
@@ -27,13 +27,14 @@ ExecStartPost=%%PODMAN%% exec \
     sh -c "echo '%u ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers.d/%u-all-nopasswd"
 ExecStop=%%PODMAN%% stop \
     --time 2 \
-    --cidfile %t/%n-cid
+    --cidfile %t/alpine-dev-env-for-%u.ctr-id
 ExecStopPost=%%PODMAN%% rm \
     --ignore \
     --force \
-    --cidfile %t/%n-cid
+    --cidfile %t/alpine-dev-env-for-%u.ctr-id
+PIDFile=%t/alpine-dev-env-for-%u.pid
 KillMode=none
-PIDFile=%t/%n-pid
+Type=forking
 
 [Install]
 WantedBy=multi-user.target
