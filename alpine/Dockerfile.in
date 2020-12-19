@@ -15,12 +15,6 @@ RUN apk upgrade -a
 RUN /usr/bin/ssh-keygen -A
 RUN printf "Port %%PORT%%\nListenAddress localhost\nPermitEmptyPasswords yes\n" >> /etc/ssh/sshd_config
 
-RUN adduser -D -u %%UID%% -g %%GID%% -h /home/alpine -D alpine \
-    && addgroup alpine abuild \
-    && echo 'alpine ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
-
-RUN sed -i 's|alpine:!|alpine:*|' /etc/shadow
-
 USER root
 
 CMD ["/usr/sbin/sshd", "-D"]
