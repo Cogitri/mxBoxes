@@ -1,6 +1,5 @@
 [Unit]
 Description=Alpine Developer Environment with local SSH Access
-Documentation=man:sshd(8) man:sshd_config(5)
 
 [Service]
 Type=forking
@@ -11,13 +10,22 @@ ExecStart=%%PODMAN%% run \
     --conmon-pidfile %t/%n-pid \
     --cidfile %t/%n-cid \
     --publish %%PORT%%:%%PORT%% \
-    --volume %h:/home/alpine \
+    --volume %h:%h \
     --security-opt label=disable \
     --userns=keep-id \
     --tty \
     --name alpine-development-environment \
     --detach \
     alpine-dev-env
+# Add our user to abuild group, we require it to access the distfiless
+ExecStartPost=%%PODMAN%% exec \
+    alpine-development-environment \
+    sed -r -e 's|(^abuild:.*)|\1%u|' \
+    -i /etc/group
+# Allow our user to run sudo without any problems
+ExecStartPost=%%PODMAN%% exec \
+    alpine-development-environment \
+    sh -c "echo '%u ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers.d/%u-all-nopasswd"
 ExecStop=%%PODMAN%% stop \
     --time 2 \
     --cidfile %t/%n-cid
