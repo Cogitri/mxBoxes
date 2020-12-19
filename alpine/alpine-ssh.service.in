@@ -20,8 +20,7 @@ ExecStart=%%PODMAN%% run \
 # Add our user to abuild group, we require it to access the distfiless
 ExecStartPost=%%PODMAN%% exec \
     alpine-development-environment \
-    sed -r -e 's|(^abuild:.*)|\1%u|' \
-    -i /etc/group
+    adduser %u abuild
 # Allow our user to run sudo without any problems
 ExecStartPost=%%PODMAN%% exec \
     alpine-development-environment \
