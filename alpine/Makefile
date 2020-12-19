@@ -31,6 +31,7 @@ endif
 sanity-ssh-keygen:
 ifeq ($(strip $(SSH_KEYGEN)),)
 	$(error ssh-keygen not installed, pass path to ssh-keygen binary via SSH_KEYGEN=)
+endif
 
 sanity-home:
 ifeq ($(strip $(HOME)),)
