@@ -6,7 +6,7 @@ die() {
 
 run() {
     ssh -p %%PORT%% -tt \
-        -o User=alpine \
+        -o User=$USER \
         -o IdentityFile=~/.ssh/alpine-dev-env \
         -o NoHostAuthenticationForLocalhost=yes \
         -o LogLevel=QUIET \
@@ -23,15 +23,13 @@ if [ "${PWD%*/$APORTSDIRNAME/*}" = "$PWD" ]; then
         "It must be run under '$APORTSDIR'"
 fi
 
-APORTSDIR="$(printf -- "%s" "$APORTSDIR" | sed -e "s|$HOME|/home/alpine|")"
-
 # Generate new abuild key if not set
-cmd='grep -sq "^PACKAGER_PRIVKEY=" /home/alpine/.abuild/abuild.conf || abuild-keygen -n -a'
+cmd="grep -sq '^PACKAGER_PRIVKEY=' $HOME/.abuild/abuild.conf || abuild-keygen -n -a"
 
 # Copy keys over, we need this so packages will actually succeed when
 # building (because of the signing stage), this is also required to
 # install them
-cmd="$cmd && sudo cp -v /home/alpine/.abuild/*.rsa.pub /etc/apk/keys"
+cmd="$cmd && sudo cp -v $HOME/.abuild/*.rsa.pub /etc/apk/keys"
 
 case "$1" in
     checksum|unpack) cmd="$cmd; cd $APORTSDIR/${PWD#*/$APORTSDIRNAME/} && abuild $@" ;;
