@@ -14,16 +14,16 @@ ExecStart=%%PODMAN%% run \
     --security-opt label=disable \
     --userns=keep-id \
     --tty \
-    --name alpine-development-environment \
+    --name alpine-dev-env-for-%u \
     --detach \
     alpine-dev-env
 # Add our user to abuild group, we require it to access the distfiless
 ExecStartPost=%%PODMAN%% exec \
-    alpine-development-environment \
+    alpine-dev-env-for-%u \
     adduser %u abuild
 # Allow our user to run sudo without any problems
 ExecStartPost=%%PODMAN%% exec \
-    alpine-development-environment \
+    alpine-dev-env-for-%u \
     sh -c "echo '%u ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers.d/%u-all-nopasswd"
 ExecStop=%%PODMAN%% stop \
     --time 2 \
