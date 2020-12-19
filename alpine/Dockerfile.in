@@ -15,7 +15,6 @@ RUN apk add -U --no-cache \
     abuild \
     sudo \
     openssh-server \
-    shadow \
     fish
 RUN apk upgrade -a
 RUN setup-apkcache /var/cache/apk
