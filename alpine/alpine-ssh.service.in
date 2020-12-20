@@ -25,6 +25,10 @@ ExecStartPost=%%PODMAN%% exec \
 ExecStartPost=%%PODMAN%% exec \
     alpine-dev-env-for-%u \
     sh -c "echo '%u ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers.d/%u-all-nopasswd"
+# Add local repos
+ExecStartPost=%%PODMAN%% exec \
+    alpine-dev-env-for-%u \
+    sh -c "printf -- >> /etc/apk/repositories '%h/packages/%%s\n' main community testing"
 ExecStop=%%PODMAN%% stop \
     --time 2 \
     --cidfile %t/alpine-dev-env-for-%u.ctr-id
