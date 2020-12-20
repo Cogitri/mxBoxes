@@ -4,9 +4,6 @@ MAINTAINER Leo <thinkabit.ukim@gmail.com>
 RUN rm /etc/apk/repositories \
     && printf -- >> /etc/apk/repositories \
     'http://dl-cdn.alpinelinux.org/alpine/edge/%s\n' \
-    main community testing \
-    && printf -- >> /etc/apk/repositories \
-    '/home/alpine/packages/%s\n' \
     main community testing
 
 RUN apk add -U --no-cache \
@@ -15,7 +12,8 @@ RUN apk add -U --no-cache \
     abuild \
     sudo \
     openssh-server \
-    fish
+    fish \
+    less
 RUN apk upgrade -a
 RUN setup-apkcache /var/cache/apk
 
