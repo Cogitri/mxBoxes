@@ -36,4 +36,8 @@ case "$1" in
     *) cmd="$cmd && cd $APORTSDIR/${PWD#*/$APORTSDIRNAME/} && sudo apk upgrade -U -a && abuild $@" ;;
 esac
 
+if ! systemctl --user is-active --quiet alpine-ssh.service; then
+    die "alpine-ssh.service must be active, run systemctl --user start alpine-ssh.service"
+fi
+
 run "$cmd"
