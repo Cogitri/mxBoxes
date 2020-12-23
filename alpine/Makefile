@@ -4,6 +4,7 @@ PODMAN_BUILD ?= $(shell command -v podman)
 SSH_KEYGEN ?= $(shell command -v ssh-keygen)
 HOME ?= $(shell echo $$HOME)
 APORTSDIR ?= $(shell echo $$APORTSDIR)
+BINDIR ?= $(HOME)/bin
 
 .DEFAULT_GOAL := install
 
@@ -67,5 +68,5 @@ image: sanity-podman-build
 	$(PODMAN_BUILD) build -t alpine-dev-env .
 
 install: sanity abuild keygen systemd dockerfile image
-	install -Dm0755 abuild -t $(HOME)/bin
+	install -Dm0755 abuild -t $(BINDIR)
 	install -Dm0644 alpine-ssh.service -t $(HOME)/.config/systemd/user
