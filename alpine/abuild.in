@@ -29,7 +29,7 @@ cmd="grep -sq '^PACKAGER_PRIVKEY=' $HOME/.abuild/abuild.conf || abuild-keygen -n
 # Copy keys over, we need this so packages will actually succeed when
 # building (because of the signing stage), this is also required to
 # install them
-cmd="$cmd && sudo cp -v $HOME/.abuild/*.rsa.pub /etc/apk/keys"
+cmd="$cmd && sudo cp $HOME/.abuild/*.rsa.pub /etc/apk/keys"
 
 case "$1" in
     checksum|unpack) cmd="$cmd; cd $APORTSDIR/${PWD#*/$APORTSDIRNAME/} && abuild $@" ;;
