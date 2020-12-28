@@ -17,7 +17,7 @@ RUN apk upgrade -a
 RUN setup-apkcache /var/cache/apk
 
 RUN /usr/bin/ssh-keygen -A
-RUN printf "Port %%PORT%%\nListenAddress localhost\nPermitEmptyPasswords yes\n" >> /etc/ssh/sshd_config
+RUN printf "Port %%PORT%%\nListenAddress localhost\n" >> /etc/ssh/sshd_config
 
 USER root
 
