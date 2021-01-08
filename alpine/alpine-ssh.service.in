@@ -16,6 +16,7 @@ ExecStart=%%PODMAN%% run \
     --tty \
     --name alpine-dev-env-for-%u \
     --detach \
+    --mount type=volume,source=apk-cache,target=/var/cache/apk \
     alpine-dev-env
 # Add our user to abuild group, we require it to access the distfiless
 ExecStartPost=%%PODMAN%% exec \
